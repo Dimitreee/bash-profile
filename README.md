@@ -113,8 +113,3 @@ Colors reference
     On_IPurple='\e[10;95m'  # Purple
     On_ICyan='\e[0;106m'    # Cyan
     On_IWhite='\e[0;107m'   # White
-
-TODO
-====
-
-- Make ~/.profile load some stuff that maybe should be in the MOTD, but isn't, like maybe load avarage or system time
