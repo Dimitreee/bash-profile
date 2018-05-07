@@ -1,42 +1,149 @@
-#add some color to our terminal, if ls supports it
-ls_color_support=`ls --color 2>/dev/null 1>/dev/null ; echo $?`
-if [ $ls_color_support == "0" ]; then 
-    alias ls='ls --color=auto'
-    alias ll='ls --color=auto -l'
-    alias grep='grep --color=auto'
-fi
 
-#careful copy, don't overwrite by default
-alias cp='cp -ip'
+## FIX logging (don not stop running processes)
+alias logout="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+alias logoff="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
-#for those of us with lazy thumbs/stiff space bars
-alias cd..='cd ../'
 
-#check alias when querying 'which'
-# Doesn't work on Debian derived distros. Removing for now. 
-#alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
+## FIX sleep problem on MAC laptops (handle with care)
+#   ------------------------------------------------------------
+alias when_sleep=' sudo pmset -a '
+alias hibernate=' sudo pmset -a hibernatemode 25 '
+alias sleep=' sudo pmset -a hibernatemode 0 '
+alias safesleep=' sudo pmset -a hibernatemode 3 '
+alias smartsleep=' sudo pmset -a hibernatemode 2 '
 
-#openstack aliases which provide bash-completion support
-NOVA_OUTPUT_LOG=$(mktemp)
-GLANCE_OUTPUT_LOG=$(mktemp)
-CINDER_OUTPUT_LOG=$(mktemp)
-KEYSTONE_OUTPUT_LOG=$(mktemp)
-export NOVA_OUTPUT_LOG GLANCE_OUTPUT_LOG CINDER_OUTPUT_LOG KEYSTONE_OUTPUT_LOG
-_nova() {
-	nova $* | tee -a $NOVA_OUTPUT_LOG
-}
-alias nova="_nova $*"
-_glance() {
-	glance $* | tee -a $GLANCE_OUTPUT_LOG
-}
-alias glance="_glance $*"
-_cinder() {
-	cinder $* | tee -a $CINDER_OUTPUT_LOG
-}
-alias cinder="_cinder $*"
-_keystone() {
-	keystone $* | tee -a $KEYSTONE_OUTPUT_LOG
-}
-alias keystone="_keystone $*"
 
-alias ssh="~/.bash/try-mosh.sh $*"
+# SYSTEMS OPERATIONS & INFORMATION
+#   ---------------------------------------
+alias mountReadWrite='/sbin/mount -uw /'    # mountReadWrite:   For use when booted into single-user
+
+
+## FIX and destroy .DS_Store files in the folder I am currently in
+#   ------------------------------------------------------------
+alias killDS='find . -name *.DS_Store -type f -delete'
+
+
+## git configuration
+# specify a global exclusion list
+#   ------------------------------------------------------------
+git config --global core.excludesfile ~/.gitignore
+# adding .DS_Store to that list
+echo .DS_Store >> ~/.gitignore
+
+
+## testing libs available status
+#   ------------------------------------------------------------
+alias testme='	git --version;
+		node --version;
+		npm --version;
+		bower -v;
+		karma --version;
+        	phantomjs --version;
+		casperjs --version;
+		grunt -version;
+	    	php -v;
+		mongo --version; 
+		mongod --version;
+		mongos --version;
+		yo --version;
+		grunt --version;
+		bower --version;
+        	sass -v;
+		protractor --version;
+		cordova -v;
+		uname -a;
+		sw_vers;
+		webpack -v;
+	'
+
+
+## finder
+#   ------------------------------------------------------------
+alias f='open -a Finder ./'
+alias .='open -a Finder ./'
+
+
+## where is my stuff
+#   ------------------------------------------------------------
+alias where='
+		which git;
+        	which express;
+		which yo; 
+		which gulp;
+		which mongo;
+		which cordova;
+		which php;
+		which npm;
+		which node;
+		which bower;
+		which pouchdb;
+		which couchdb;
+	'
+
+
+## REMOVING all the Node dependencies
+#   ------------------------------------------------------------
+# alias npm_dev='npm ls | grep -v 'npm@' | awk '/@/ {print $2}' | awk -F@ '{print $1}' | xargs npm rm'
+
+
+# Start calculator with math support
+alias bc='bc -l'
+
+
+## Improving the terminal for fast typers
+#   ------------------------------------------------------------		
+alias cd..='cd ../'                         # Go back 1  level 
+alias ..='cd ../'                           # Go back 1  level
+alias ...='cd ../../'                       # Go back 2  levels
+alias .3='cd ../../../'                     # Go back 3  levels
+alias .4='cd ../../../../'                  # Go back 4  levels
+alias .5='cd ../../../../../'               # Go back 5  levels
+alias .6='cd ../../../../../../'            # Go back 6  levels
+alias c='clear'   
+alias show_options='shopt'
+alias make1mb='mkfile 1m ./1MB.dat'         # make1mb:      Creates a file of 1mb size (all zeros)
+alias make5mb='mkfile 5m ./5MB.dat'         # make5mb:      Creates a file of 5mb size (all zeros)
+alias make10mb='mkfile 10m ./10MB.dat'      # make10mb:     Creates a file of 10mb size (all zeros)
+
+
+
+#   extract:  Extract most know archives with one command
+#   -----------------------------------------------------------
+    extract () {
+        if [ -f $1 ] ; then
+          case $1 in
+            *.tar.bz2)   tar xjf $1     ;;
+            *.tar.gz)    tar xzf $1     ;;
+            *.bz2)       bunzip2 $1     ;;
+            *.rar)       unrar e $1     ;;
+            *.gz)        gunzip $1      ;;
+            *.tar)       tar xf $1      ;;
+            *.tbz2)      tar xjf $1     ;;
+            *.tgz)       tar xzf $1     ;;
+            *.zip)       unzip $1       ;;
+            *.Z)         uncompress $1  ;;
+            *.7z)        7z x $1        ;;
+            *)     echo "'$1' cannot be extracted via extract()" ;;
+             esac
+         else
+             echo "'$1' is not a valid file"
+         fi
+    }
+
+
+#   spotlight: Search for a file using MacOS Spotlight's metadata
+#   -----------------------------------------------------------
+spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
+
+
+## get top process eating memory
+alias psmem='ps aux | sort -nr -k 4'
+alias psmem10='ps aux | sort -nr -k 4 | head -10'
+ 
+## get top process eating cpu ##
+alias pscpu='ps aux | sort -nr -k 3'
+alias pscpu10='ps aux | sort -nr -k 3 | head -10'
+
+#   cpuHogs:  Find CPU hogs
+#   -----------------------------------------------------
+alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
